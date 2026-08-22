@@ -59,8 +59,8 @@ export default defineConfig({
     outDir: OUT_DIR || 'dist',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        page404: resolve(__dirname, '404.html'),
+        main: resolve(import.meta.dirname, 'index.html'),
+        page404: resolve(import.meta.dirname, '404.html'),
       },
     },
   },

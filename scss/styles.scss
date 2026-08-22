@@ -1,3 +1,6 @@
+@use "modal";
+@use "theme";
+
 :root {
   --edge-gap: 8px;
   --color-link-hover-bg: rgba(205, 205, 205, 0.5);
@@ -213,11 +216,7 @@ a:hover {
 
 /* MODAL */
 
-@import "modal";
-
 /* THEMING */
-
-@import "theme";
 
 /* MEDIA QUERIES */
 

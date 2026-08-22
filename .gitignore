@@ -3,3 +3,4 @@ dist/
 data.json
 node_modules
 .reasonix/
+live-server/data
