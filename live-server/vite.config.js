@@ -6,10 +6,9 @@ export default defineConfig({
   root: "editor",
   base: "/editor/",
   build: {
-    rolupOptions: {
+    rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        page404: resolve(__dirname, '404.html'),
+        main: resolve(import.meta.dirname, 'editor/index.html'),
       },
     },
   },
