@@ -73,7 +73,7 @@ After the container is alive, open `http://DOCKER_HOST:3000/` to see the initial
 
 For the live editor, open `http//DOCKER_HOST:3000/editor/`, there's no link for it on the startpage.
 
-Checkout the configuration file [fly.toml](https://github.com/reorx/sui2/blob/master/fly.toml) as an example for how to deploy the Docker image to fly.io
+Checkout the configuration file [fly.toml](https://github.com/Skyline-Gazer/sui2/blob/master/fly.toml) as an example for how to deploy the Docker image to fly.io
 
 ### Build Docker Image
 
@@ -90,7 +90,7 @@ see [Automatic platform ARGs in the global scope](https://docs.docker.com/engine
 
 ## `data.json` editing
 
-There's a full example in [data.example.json](https://github.com/reorx/sui2/blob/master/data.example.json),
+There's a full example in [data.example.json](https://github.com/Skyline-Gazer/sui2/blob/master/data.example.json),
 it's self explanatory so I'm not going to write too much about it, maybe a json schema will be created as a supplement in the future.
 
 The only thing worth mentioning here is the `icon` attribute,
