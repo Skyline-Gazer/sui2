@@ -27,7 +27,22 @@ To build the project, simply follow the steps below.
 4. Upload to a static hosting.
 
    There are various hosting services like GitHub Pages, Cloudflare Pages, Netlify.
-   Examples will be documented later on.
+
+### Deploy to Cloudflare Pages
+
+1. Create a **Pages** project in the Cloudflare dashboard and connect your Git repository.
+2. Set the **Framework preset** to **None** — this project is plain Vite and there is no "Vite" preset in the list. Do **not** pick VitePress or any other preset, or the build will produce the wrong site.
+3. Configure the build:
+
+   | Setting | Value |
+   |---|---|
+   | Build command | `npm run build` |
+   | Build output directory | `dist` |
+
+4. Add a `NODE_VERSION` environment variable (e.g. `22` or newer) — Vite 8 requires Node.js ≥ 20.19 and Cloudflare's default may be too old.
+5. Deploy. The custom 404 page (`dist/404.html`) and `_redirects` are picked up automatically, so unmatched routes show the project's own 404 page.
+
+> Note: unlike Vercel's `vercel.json` or Netlify's `netlify.toml`, Cloudflare Pages does **not** support a config file in the repository — the build settings above live in the Cloudflare dashboard and must be set there.
 
 If you are happy with the look and functionality of sui2, it is recommended to use this project as a submodule rather than fork it. Please checkout [reorx/start](https://github.com/reorx/start) as an example for how to use it in another project, and how to build with GitHub Actions and deploy to Cloudflare Pages.
 
