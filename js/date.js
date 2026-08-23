@@ -29,11 +29,10 @@ export function date() {
   };
   let date = currentDate.toLocaleDateString("en-GB", dateOptions);
   const time = currentDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-  const geoText = geo ? `${escapeHtml(geo.country_code)}, ${escapeHtml(geo.ip)}` : '';
-  const tzText = geo ? escapeHtml(geo.timezone) : '';
+  const geoText = geo ? `<span class="geo">· ${escapeHtml(geo.country_code)}, ${escapeHtml(geo.ip)}</span>` : '';
+  const tzText = geo ? `<span class="tz">· ${escapeHtml(geo.timezone)}</span>` : '';
   document.getElementById("header_date").innerHTML =
-    `<span class="date">${date}${geoText ? ` <span class="geo">${geoText}</span>` : ''}</span>` +
-    `<span class="time">${time}${tzText ? ` ${tzText}` : ''}</span>`;
+    `<span class="date">${date}${geoText}</span><span class="time">${time}${tzText}</span>`;
 }
 
 export function greet() {

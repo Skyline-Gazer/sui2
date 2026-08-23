@@ -119,6 +119,12 @@ a:hover {
     margin-inline-start: 3em;
     float: right;
   }
+  .geo,
+  .tz {
+    color: var(--color-text-acc);
+    font-size: 0.9em;
+    margin-inline-start: 0.6em;
+  }
 }
 
 .apps_loop {
