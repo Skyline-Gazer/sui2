@@ -7,6 +7,12 @@ on:
     paths-ignore:
       - 'README.md'
 
+# serialize runs on the same branch: overlapping runs would otherwise race
+# on the shared tmp-* tags, mixing artifacts from different commits
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   IMAGE: ghcr.io/skyline-gazer/sui2
 
@@ -38,14 +44,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # push to a temporary per-arch tag; the merge job combines them into
-      # the final multi-arch tags (latest / sha)
+      # push to a per-commit temporary tag (tmp-<sha>-<arch>) so a merge
+      # job can only ever resolve artifacts built from its own commit
       - name: Build and push
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ${{ env.IMAGE }}:tmp-${{ matrix.arch }}
+          tags: ${{ env.IMAGE }}:tmp-${{ github.sha }}-${{ matrix.arch }}
 
   merge:
     name: Create multi-arch manifests
@@ -65,14 +71,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       # imagetools create keeps buildx provenance/attestations (docker
       # manifest create does not). The tmp-* tags can be removed manually
-      # later on the package page.
+      # later on the package page or with a GHCR retention policy.
       - name: Merge manifests
         run: |
           docker buildx imagetools create \
             -t ${{ env.IMAGE }}:latest \
-            ${{ env.IMAGE }}:tmp-amd64 ${{ env.IMAGE }}:tmp-arm64
+            ${{ env.IMAGE }}:tmp-${{ github.sha }}-amd64 ${{ env.IMAGE }}:tmp-${{ github.sha }}-arm64
           docker buildx imagetools create \
             -t ${{ env.IMAGE }}:${{ github.sha }} \
-            ${{ env.IMAGE }}:tmp-amd64 ${{ env.IMAGE }}:tmp-arm64
+            ${{ env.IMAGE }}:tmp-${{ github.sha }}-amd64 ${{ env.IMAGE }}:tmp-${{ github.sha }}-arm64
       - name: Image digest
         run: docker buildx imagetools inspect ${{ env.IMAGE }}:latest
