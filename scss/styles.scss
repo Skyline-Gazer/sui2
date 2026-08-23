@@ -125,6 +125,16 @@ a:hover {
     font-size: 0.9em;
     margin-inline-start: 0.6em;
   }
+  #time_is_link {
+    color: var(--color-text-acc);
+    font-size: 0.8em;
+    margin-inline-end: 0.6em;
+    text-decoration: none;
+  }
+  .time-widget {
+    font-size: 1.5em;
+    font-weight: 600;
+  }
 }
 
 .apps_loop {
