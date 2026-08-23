@@ -15,7 +15,6 @@ function loadSearchItems() {
       name: nameEl.textContent,
       el,
       nameEl,
-      clsss: 'apps_item',
     })
   })
 
@@ -26,7 +25,6 @@ function loadSearchItems() {
       name: nameEl.textContent,
       el,
       nameEl,
-      clsss: 'links_item',
     })
   })
 
@@ -44,23 +42,17 @@ const keywordEl = document.getElementById("keyword")
 const regularCharsRe = /\w/
 
 function updateKeyword(key) {
-  // backspace
-  if (key == 8) {
+  // Backspace
+  if (key === 'Backspace') {
     if (store.keyword.length > 0) {
       store.keyword = store.keyword.slice(0, store.keyword.length - 1)
     }
-  } else if (key == 27) {  // ESC
+  } else if (key === 'Escape') {  // ESC
     store.keyword = ''
   } else {
-    // convert key code to string, see https://stackoverflow.com/a/5829387/596206
-    let char = String.fromCharCode((96 <= key && key <= 105) ? key-48 : key)
-    if (!regularCharsRe.test(char)) {
-      char = ''
-    }
-    // console.log('key', key, `|${char}|`)
-
-    if (char) {
-      store.keyword = store.keyword + char
+    // e.key already gives the character; keep only single word chars
+    if (key.length === 1 && regularCharsRe.test(key)) {
+      store.keyword = store.keyword + key
     }
   }
   if (store.keyword) {
@@ -72,26 +64,22 @@ function updateKeyword(key) {
 }
 
 function handleKeyPress(e) {
-  var key = e.keyCode || e.which;
   if (e.ctrlKey || e.metaKey || e.altKey) {
     // ignore key combination
     return
   }
-  if (key == 9 || key == 13) { // Tab to switch and Enter to open
-      // e.preventDefault();
-      // e.stopPropagation();
+  if (e.key === 'Tab' || e.key === 'Enter') { // Tab to switch and Enter to open
       // use default behavior
       return
   } else {
     const oldKeyword = store.keyword
-    const keyword = updateKeyword(key)
+    const keyword = updateKeyword(e.key)
     // ignore empty
     if (oldKeyword === keyword && keyword === '') return
 
     // only search when keyword changes
     if (keyword !== oldKeyword) {
       const items = store.fuse.search(keyword)
-      console.log('searched', keyword, items)
       handleMatchedItems(items)
     }
   }
@@ -123,7 +111,6 @@ function handleMatchedItems(items) {
 }
 
 function highlightText(el, match) {
-  // console.log('match', match, el)
   // get the longest part
   match.indices.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]))
   const pos = match.indices[0]

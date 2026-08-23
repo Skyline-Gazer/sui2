@@ -86,11 +86,16 @@ export default defineConfig({
           return svg
         },
         domain: (url) => {
-          var o = new URL(url);
-          if (o.port) {
-            return `${o.hostname}:${o.port}`
+          try {
+            var o = new URL(url);
+            if (o.port) {
+              return `${o.hostname}:${o.port}`
+            }
+            return o.hostname
+          } catch (e) {
+            // invalid URL in data file should not break the build
+            return url
           }
-          return o.hostname
         }
       }
     }),
