@@ -7,7 +7,7 @@ processes = []
 
 
 [build]
-  image = "reorx/sui2:latest"
+  image = "ghcr.io/skyline-gazer/sui2:latest"
 
 [env]
 
