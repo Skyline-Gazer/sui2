@@ -38,24 +38,11 @@ function loadSearchItems() {
   })
 }
 
-// open/closed state of every category taken when a search session starts;
-// restored when the search is cleared
-let detailsSnapshot = null
-
-function snapshotDetails() {
-  detailsSnapshot = new Map()
-  document.querySelectorAll('.apps, .links_category').forEach(d => {
-    detailsSnapshot.set(d, d.open)
-  })
-}
-
-function restoreDetails() {
-  if (!detailsSnapshot) return
-  document.querySelectorAll('.apps, .links_category').forEach(d => {
-    d.open = detailsSnapshot.get(d) || false
-  })
-  detailsSnapshot = null
-}
+// details that the search itself expanded, mapped to whether they were
+// open before the search touched them. When the search is cleared, only
+// these are rolled back (and only while they are still open), so manual
+// user toggles — before or during the search — are always preserved.
+const searchOpened = new Map()
 
 const keywordEl = document.getElementById("keyword")
 const regularCharsRe = /\w/
@@ -97,9 +84,6 @@ function handleKeyPress(e) {
     // only act when the keyword changes
     if (keyword !== oldKeyword) {
       if (keyword) {
-        // first input of a search session: remember the current
-        // open/closed state so clearing the search can restore it
-        if (oldKeyword === '') snapshotDetails()
         const items = store.fuse.search(keyword)
         handleMatchedItems(items)
       } else {
@@ -120,11 +104,15 @@ function resetItems() {
   })
 }
 
-// restore the search UI and the category open/closed state as it was
-// when the search session started (keeps manual user toggles)
+// restore the search UI; roll back only the category expansions the
+// search itself caused (and only those still open), so manual user
+// toggles are preserved
 function resetSearchState() {
   resetItems()
-  restoreDetails()
+  searchOpened.forEach((wasOpen, details) => {
+    if (!wasOpen && details.open) details.open = false
+  })
+  searchOpened.clear()
 }
 
 function handleMatchedItems(items) {
@@ -135,7 +123,13 @@ function handleMatchedItems(items) {
     const item = i.item
     // expand the collapsed category (details) so the matched item is visible
     const details = item.el.closest('details')
-    if (details) details.open = true
+    if (details) {
+      // remember the state before the search first touched this category
+      if (!searchOpened.has(details)) {
+        searchOpened.set(details, details.open)
+      }
+      details.open = true
+    }
     if (index === 0) {
       item.el.focus();
     }
