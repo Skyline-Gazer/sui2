@@ -6,7 +6,23 @@
   <meta name="description" content="{{description}}">
   <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
   <link rel="shortcut icon" href="/icon-512.png" type="image/png">
+  <script>
+    // apply the theme the user picked on the startpage (same CSS variables
+    // and localStorage keys as js/themer.js), before the body renders
+    (function () {
+      var root = document.documentElement;
+      ['color-background', 'color-text-pri', 'color-text-acc'].forEach(function (key) {
+        var value = localStorage.getItem(key);
+        if (value) root.style.setProperty('--' + key, value);
+      });
+    })();
+  </script>
   <style>
+    html,
+    body {
+      background-color: var(--color-background, #ffffff);
+      color: var(--color-text-pri, #000000);
+    }
     .container {
       display: flex;
       flex-direction: column;
@@ -15,6 +31,14 @@
     }
     .container * {
       align-self: center;
+    }
+    h2 {
+      font-weight: 400;
+      margin: 0 0 0.5em;
+    }
+    p {
+      color: var(--color-text-acc, #666666);
+      margin: 0;
     }
   </style>
 </head>
