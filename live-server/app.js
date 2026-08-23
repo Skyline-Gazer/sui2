@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs')
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const { resolve } = require('path');
 
 const app = express()
@@ -70,6 +71,25 @@ stderr=${stderr}`);
 
 // server code
 
+const AUTH_TOKEN = process.env.LIVE_SERVER_TOKEN || ''
+if (!AUTH_TOKEN) {
+  console.warn('WARNING: LIVE_SERVER_TOKEN is not set. POST /api/updateDataFile and /api/build are unauthenticated. Set LIVE_SERVER_TOKEN to require an Authorization: Bearer <token> header.')
+}
+
+// require auth for mutating endpoints when LIVE_SERVER_TOKEN is configured
+const authRequired = (req, res, next) => {
+  if (!AUTH_TOKEN) return next()
+  const header = req.headers['authorization'] || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : ''
+  const a = Buffer.from(token)
+  const b = Buffer.from(AUTH_TOKEN)
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    res.status(401).send('Unauthorized')
+    return
+  }
+  next()
+}
+
 app.use(bodyParser.text({type: 'text/plain'}))
 
 app.get('/api/getData', (req, res) => {
@@ -78,7 +98,7 @@ app.get('/api/getData', (req, res) => {
   res.send(data)
 })
 
-app.post('/api/updateDataFile', (req, res) => {
+app.post('/api/updateDataFile', authRequired, (req, res) => {
   rawBody = req.body
   try {
     JSON.parse(rawBody)
@@ -95,7 +115,7 @@ app.post('/api/updateDataFile', (req, res) => {
 })
 
 
-app.post('/api/build', async (req, res) => {
+app.post('/api/build', authRequired, async (req, res) => {
   buildStartpage((err, stdout, stderr) => {
     if (err) {
       const errMsg = `Error: ${err}`
