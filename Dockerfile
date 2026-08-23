@@ -1,38 +1,37 @@
-FROM node:22-buster-slim
-
-# install dev dependencies for sui2/live-server
+# ---------- Stage 1: builder (build the live-server editor frontend) ----------
+FROM node:26-alpine AS builder
 WORKDIR /live-server
 ADD live-server/package.json ./
-RUN npm i --dev
-
-# build sui2/live-server frontend
+RUN npm i --no-audit --no-fund
 ADD live-server ./
-RUN npm run build
+RUN npm run build && npm cache clean --force
 
-FROM node:22-buster-slim
+# ---------- Stage 2: runtime ----------
+FROM node:26-alpine
 
-ENV TINI_VERSION v0.19.0
-# requires using buildx
-ARG TARGETARCH
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-${TARGETARCH} /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
+# tini for proper signal handling (alpine provides it as a tiny apk package,
+# avoids downloading a binary from GitHub releases)
+RUN apk add --no-cache tini
+ENTRYPOINT ["/sbin/tini", "--"]
 
-# install dependencies for sui2
+# main project dependencies.
+# NOTE: devDependencies are intentionally kept in the runtime image because
+# app.js rebuilds the startpage on first boot (and on the live editor's
+# "Build" action) via `npm run build`, which requires vite & co.
 WORKDIR /app
 ADD package.json ./
-RUN npm i
+RUN npm i --no-audit --no-fund && npm cache clean --force
 
-# install prod dependencies for sui2/live-server
+# live-server runtime deps only (express)
 WORKDIR /app/live-server
 ADD live-server/package.json ./
-RUN npm i --omit=dev
+RUN npm i --omit=dev --no-audit --no-fund && npm cache clean --force
 
-# add all files
+# add all source files (node_modules / dist / .git are excluded via .dockerignore)
 ADD . /app
 
-# copy editor dist from the last image
-COPY --from=0 /live-server/editor/dist ./editor/dist
+# prebuilt editor frontend from the builder stage
+COPY --from=builder /live-server/editor/dist /app/live-server/editor/dist
 
 ENV DATA_DIR /data
 CMD ["node", "app.js"]
