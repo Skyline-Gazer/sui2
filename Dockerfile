@@ -33,5 +33,5 @@ ADD . /app
 # prebuilt editor frontend from the builder stage
 COPY --from=builder /live-server/editor/dist /app/live-server/editor/dist
 
-ENV DATA_DIR /data
+ENV DATA_DIR=/data
 CMD ["node", "app.js"]
