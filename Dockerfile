@@ -1,4 +1,4 @@
-FROM node:16-buster-slim
+FROM node:22-buster-slim
 
 # install dev dependencies for sui2/live-server
 WORKDIR /live-server
@@ -9,7 +9,7 @@ RUN npm i --dev
 ADD live-server ./
 RUN npm run build
 
-FROM node:16-buster-slim
+FROM node:22-buster-slim
 
 ENV TINI_VERSION v0.19.0
 # requires using buildx

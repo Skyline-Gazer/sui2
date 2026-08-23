@@ -82,7 +82,7 @@ export default defineConfig({
       helpers: {
         iconify: (name) => {
           const svg = getIconSVG(name)
-          if (!svg) return `no icon ${name}`
+          if (!svg) return `no icon ${name.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]))}`
           return svg
         },
         domain: (url) => {

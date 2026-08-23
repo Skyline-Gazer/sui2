@@ -103,7 +103,7 @@ function handleMatchedItems(items) {
   const matchedClass = 'matched'
   store.searchItems.forEach(item => {
     item.el.setAttribute('tabindex', 0)
-    item.nameEl.innerHTML = item.name
+    item.nameEl.textContent = item.name
     item.el.classList.remove(matchedClass)
   })
 
@@ -129,7 +129,13 @@ function highlightText(el, match) {
   const pos = match.indices[0]
   const start = pos[0], end = pos[1] + 1
   const text = match.value
-  el.innerHTML = `${text.slice(0, start)}<em>${text.slice(start, end)}</em>${text.slice(end, text.length)}`
+  // build highlight nodes with DOM APIs to avoid HTML injection
+  el.textContent = ''
+  el.append(
+    document.createTextNode(text.slice(0, start)),
+    Object.assign(document.createElement('em'), { textContent: text.slice(start, end) }),
+    document.createTextNode(text.slice(end, text.length)),
+  )
 }
 
 export function initKeyboardSearch() {
