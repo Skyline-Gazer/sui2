@@ -41,12 +41,12 @@ but also gives you an interface to edit and build the startpage lively.
 
 ![SUI2 Live Editor](images/live-editor.png)
 
-The image is hosted on Docker hub at: [reorx/sui2](https://hub.docker.com/r/reorx/sui2)
+The image is built from this repository and published to GitHub Container Registry at: [ghcr.io/skyline-gazer/sui2](https://github.com/Skyline-Gazer/sui2/pkgs/container/sui2)
 
 Run the following command to get started:
 
 ```bash
-docker run --rm -t -p 3000:3000 -v data:/data reorx/sui2
+docker run --rm -t -p 3000:3000 -v data:/data ghcr.io/skyline-gazer/sui2
 ```
 
 Command explained:
