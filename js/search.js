@@ -36,12 +36,25 @@ function loadSearchItems() {
     minMatchCharLength: 1,
     threshold: 0.2,
   })
+}
 
-  // remember which categories were initially collapsed, so a cleared
-  // search can restore them
+// open/closed state of every category taken when a search session starts;
+// restored when the search is cleared
+let detailsSnapshot = null
+
+function snapshotDetails() {
+  detailsSnapshot = new Map()
   document.querySelectorAll('.apps, .links_category').forEach(d => {
-    if (!d.hasAttribute('open')) d.dataset.collapsed = 'true'
+    detailsSnapshot.set(d, d.open)
   })
+}
+
+function restoreDetails() {
+  if (!detailsSnapshot) return
+  document.querySelectorAll('.apps, .links_category').forEach(d => {
+    d.open = detailsSnapshot.get(d) || false
+  })
+  detailsSnapshot = null
 }
 
 const keywordEl = document.getElementById("keyword")
@@ -84,11 +97,13 @@ function handleKeyPress(e) {
     // only act when the keyword changes
     if (keyword !== oldKeyword) {
       if (keyword) {
+        // first input of a search session: remember the current
+        // open/closed state so clearing the search can restore it
+        if (oldKeyword === '') snapshotDetails()
         const items = store.fuse.search(keyword)
         handleMatchedItems(items)
       } else {
-        // search cleared (Escape / Backspace): restore the initial UI
-        // state, including categories that were collapsed by default
+        // search cleared (Escape / Backspace): restore the UI state
         resetSearchState()
       }
     }
@@ -105,13 +120,11 @@ function resetItems() {
   })
 }
 
-// restore the search UI and collapse categories that were initially
-// collapsed (their state is lost while searching)
+// restore the search UI and the category open/closed state as it was
+// when the search session started (keeps manual user toggles)
 function resetSearchState() {
   resetItems()
-  document.querySelectorAll('details[data-collapsed="true"]').forEach(d => {
-    d.removeAttribute('open')
-  })
+  restoreDetails()
 }
 
 function handleMatchedItems(items) {
