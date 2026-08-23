@@ -36,6 +36,12 @@ function loadSearchItems() {
     minMatchCharLength: 1,
     threshold: 0.2,
   })
+
+  // remember which categories were initially collapsed, so a cleared
+  // search can restore them
+  document.querySelectorAll('.apps, .links_category').forEach(d => {
+    if (!d.hasAttribute('open')) d.dataset.collapsed = 'true'
+  })
 }
 
 const keywordEl = document.getElementById("keyword")
@@ -74,26 +80,43 @@ function handleKeyPress(e) {
   } else {
     const oldKeyword = store.keyword
     const keyword = updateKeyword(e.key)
-    // ignore empty
-    if (oldKeyword === keyword && keyword === '') return
 
-    // only search when keyword changes
+    // only act when the keyword changes
     if (keyword !== oldKeyword) {
-      const items = store.fuse.search(keyword)
-      handleMatchedItems(items)
+      if (keyword) {
+        const items = store.fuse.search(keyword)
+        handleMatchedItems(items)
+      } else {
+        // search cleared (Escape / Backspace): restore the initial UI
+        // state, including categories that were collapsed by default
+        resetSearchState()
+      }
     }
   }
 }
 
-function handleMatchedItems(items) {
-  document.activeElement.blur();
-  // reset tabindex and name text
-  const matchedClass = 'matched'
+const matchedClass = 'matched'
+
+function resetItems() {
   store.searchItems.forEach(item => {
     item.el.setAttribute('tabindex', 0)
     item.nameEl.textContent = item.name
     item.el.classList.remove(matchedClass)
   })
+}
+
+// restore the search UI and collapse categories that were initially
+// collapsed (their state is lost while searching)
+function resetSearchState() {
+  resetItems()
+  document.querySelectorAll('details[data-collapsed="true"]').forEach(d => {
+    d.removeAttribute('open')
+  })
+}
+
+function handleMatchedItems(items) {
+  document.activeElement.blur();
+  resetItems()
 
   items.forEach((i, index) => {
     const item = i.item
