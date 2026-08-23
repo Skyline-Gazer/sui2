@@ -55,8 +55,8 @@
     </section>
 
     {{#apps}}
-    <section class="apps">
-      <h3>{{name}}</h3>
+    <details class="apps" {{#if collapse}}{{else}}open{{/if}}>
+      <summary>{{name}}</summary>
       <div class="apps_loop">
         {{#items}}
 
@@ -73,19 +73,19 @@
         </div>
         {{/items}}
       </div>
-    </section>
+    </details>
     {{/apps}}
 
     <section id="links">
       <h3>Bookmarks</h3>
       <div id="links_loop">
         {{#bookmarks}}
-        <div class="links_category">
-          <h4>{{category}}</h4>
+        <details class="links_category" {{#if collapse}}{{else}}open{{/if}}>
+          <summary>{{category}}</summary>
           {{#links}}
           <a href="{{url}}" target="{{target}}" class="links_item theme_color-border theme_text-select">{{name}}</a>
           {{/links}}
-        </div>
+        </details>
         {{/bookmarks}}
       </div>
     </section>

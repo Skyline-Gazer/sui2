@@ -97,6 +97,9 @@ function handleMatchedItems(items) {
 
   items.forEach((i, index) => {
     const item = i.item
+    // expand the collapsed category (details) so the matched item is visible
+    const details = item.el.closest('details')
+    if (details) details.open = true
     if (index === 0) {
       item.el.focus();
     }
