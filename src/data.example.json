@@ -2,6 +2,7 @@
   "title": "SUI2",
   "description": "a startpage for your server and / or new tab page",
   "siteUrl": "https://start.example.com/",
+  "allowSearchIndexing": false,
   "apps" : [
     {
       "name": "Cloud",

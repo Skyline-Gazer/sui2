@@ -45,8 +45,12 @@ To build the project, simply follow the steps below.
    `src/data.example.json`, and then edit it with your own applications and bookmarks.
    Set `siteUrl` to the canonical public URL of your startpage (for example,
    `https://start.example.com/`). The build uses it for the `WebSite` and
-   `CollectionPage` JSON-LD metadata that search engines can use to understand
-   the page. Leave it out for private, local-only deployments.
+   `CollectionPage` JSON-LD metadata and canonical URL that search engines can
+   use to understand the page. Leave it out for private, local-only deployments.
+   Search indexing stays disabled by default. Set `"allowSearchIndexing": true`
+   only for a public deployment you want crawled; this generates an allow rule
+   in `robots.txt` and an `index,follow` robots meta tag. You can also supply
+   `SITE_URL` and `ALLOW_SEARCH_INDEXING=true` as build environment variables.
 3. Build the result: `npm run build`
 
    The result will be stored in the `dist` folder
