@@ -29,6 +29,44 @@ try {
   }
 }
 
+const absoluteHttpUrl = (value) => {
+  if (typeof value !== 'string' || !value.trim()) return undefined
+
+  try {
+    const url = new URL(value)
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : undefined
+  } catch {
+    return undefined
+  }
+}
+
+const structuredData = (site) => {
+  const title = typeof site.title === 'string' ? site.title : 'SUI2'
+  const description = typeof site.description === 'string' ? site.description : undefined
+  const siteUrl = absoluteHttpUrl(site.siteUrl)
+  const websiteId = siteUrl ? `${siteUrl}#website` : undefined
+
+  const website = {
+    '@type': 'WebSite',
+    name: title,
+    ...(description ? { description } : {}),
+    ...(siteUrl ? { url: siteUrl, '@id': websiteId } : {}),
+  }
+
+  const page = {
+    '@type': 'CollectionPage',
+    name: title,
+    ...(description ? { description } : {}),
+    ...(siteUrl ? { url: siteUrl, '@id': `${siteUrl}#webpage` } : {}),
+    ...(websiteId ? { isPartOf: { '@id': websiteId } } : {}),
+  }
+
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [website, page],
+  }).replace(/</g, '\\u003c')
+}
+
 const manifest = {
   "name": WEBMANIFEST_NAME || "SUI2",
   "short_name": WEBMANIFEST_SHORT_NAME || "sui2",
@@ -101,7 +139,8 @@ export default defineConfig({
             // invalid URL in data file should not break the build
             return url
           }
-        }
+        },
+        structuredData: () => structuredData(data),
       }
     }),
   ].filter(x => x !== null),

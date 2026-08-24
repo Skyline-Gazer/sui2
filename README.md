@@ -43,6 +43,10 @@ To build the project, simply follow the steps below.
 
    sui2 get all the data it requires from `data.json`, you can make a copy from
    `src/data.example.json`, and then edit it with your own applications and bookmarks.
+   Set `siteUrl` to the canonical public URL of your startpage (for example,
+   `https://start.example.com/`). The build uses it for the `WebSite` and
+   `CollectionPage` JSON-LD metadata that search engines can use to understand
+   the page. Leave it out for private, local-only deployments.
 3. Build the result: `npm run build`
 
    The result will be stored in the `dist` folder
