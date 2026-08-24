@@ -98,11 +98,16 @@ let inComposition = false
 
 function handleCompositionEnd(e) {
   inComposition = false
-  if (!e.data) return
-  store.keyword = store.keyword + e.data
-  renderKeyword()
-  const items = store.fuse.search(store.keyword)
-  handleMatchedItems(items)
+  if (e.data) {
+    store.keyword = store.keyword + e.data
+    renderKeyword()
+    const items = store.fuse.search(store.keyword)
+    handleMatchedItems(items)
+  } else if (!store.keyword) {
+    // IME commit cancelled with an empty keyword: reset like a normal
+    // cleared search (consistent with the keydown path)
+    resetSearchState()
+  }
 }
 
 function handleKeyPress(e) {
@@ -154,8 +159,14 @@ function resetSearchState() {
 }
 
 function handleMatchedItems(items) {
-  document.activeElement.blur();
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
   resetItems()
+
+  // focus the first *visible* match (its category may be folded away by
+  // the user's own choice, in which case a later match takes the focus)
+  let focused = false
 
   items.forEach((i, index) => {
     const item = i.item
@@ -178,10 +189,12 @@ function handleMatchedItems(items) {
     }
     // never focus or tab into a match inside a collapsed category
     // (the item is not visible; it is still highlighted)
-    if (index === 0 && !hidden) {
+    const visible = details ? details.open : true
+    if (!focused && visible) {
       item.el.focus();
+      focused = true
     }
-    if (!hidden) {
+    if (visible) {
       const tabindex = index + 1
       item.el.setAttribute('tabindex', tabindex)
     }
