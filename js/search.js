@@ -41,18 +41,16 @@ function loadSearchItems() {
 // details that the search itself expanded, mapped to
 // { wasOpen, userTouched }:
 //  - wasOpen: whether the category was open before the search touched it
-//  - userTouched: set by the 'toggle' event when the user manually opened
-//    or closed the category during the search
+//  - userTouched: set when the user clicks the category header (summary)
+//    during the search — the only reliable signal of manual intent,
+//    because the browser may coalesce multiple open-state changes into a
+//    single 'toggle' event, which cannot distinguish programmatic
+//    changes from user clicks
 // On clearing the search, only untouched categories that were initially
 // closed and are still open are rolled back.
 const searchOpened = new Map()
-// details whose open state was changed by the search code itself; the
-// 'toggle' event fires asynchronously, so this distinguishes programmatic
-// changes from manual user toggles
-const pendingProgrammatic = new Set()
 
-function onDetailsToggle(d) {
-  if (pendingProgrammatic.delete(d)) return
+function onSummaryClick(d) {
   const info = searchOpened.get(d)
   if (info) info.userTouched = true
 }
@@ -144,12 +142,7 @@ function handleMatchedItems(items) {
         // remember the state before the search first touched this category
         searchOpened.set(details, {wasOpen: details.open, userTouched: false})
       }
-      // mark the change as programmatic so the async 'toggle' event
-      // does not count it as a manual user toggle; only set when the
-      // state actually changes, otherwise no 'toggle' event fires and
-      // the pending marker would leak and swallow a later user toggle
       if (!(info && info.userTouched) && !details.open) {
-        pendingProgrammatic.add(details)
         details.open = true
       }
     }
@@ -184,9 +177,12 @@ function highlightText(el, match) {
 export function initKeyboardSearch() {
   loadSearchItems()
   document.addEventListener('keydown', handleKeyPress);
-  // track manual open/close during a search ('toggle' fires on any
-  // open-state change, both user clicks and programmatic changes)
+  // track manual open/close during a search: only the user's click on a
+  // category header is a reliable signal (a single 'toggle' event may
+  // coalesce several state changes and cannot tell them apart)
   document.querySelectorAll('.apps, .links_category').forEach(d => {
-    d.addEventListener('toggle', () => onDetailsToggle(d))
+    d.addEventListener('click', (e) => {
+      if (e.target.closest('summary')) onSummaryClick(d)
+    })
   })
 }
