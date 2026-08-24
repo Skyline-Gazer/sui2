@@ -7,11 +7,39 @@
   <meta name="description" content="a startpage for your server and / or new tab page">
   <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
   <link rel="shortcut icon" href="./icon-512.png" type="image/png">
-  <script type="module" crossorigin src="./main-DDwxNJJH.js"></script>
-  <link rel="stylesheet" crossorigin href="./main-DZZ8uEPN.css">
+  <script type="module" crossorigin src="./main-DE8tR-8g.js"></script>
+  <link rel="stylesheet" crossorigin href="./main-I34NkmsL.css">
 <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
 
 <body>
+
+  <section id="modal">
+    <div>
+      <header id="modal-header">
+        <h1>Options</h1>
+        <a href="#" title="Close" aria-label="Close options" class="modal-close">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
+        </a>
+      </header>
+
+      <h2>Color themes</h2>
+
+      <div id="modal-theme">
+        <button data-theme="blackboard" class="theme-button theme-blackboard">Blackboard</button>
+        <button data-theme="gazette" class="theme-button theme-gazette">Gazette</button>
+        <button data-theme="espresso" class="theme-button theme-espresso">Espresso</button>
+        <button data-theme="cab" class="theme-button theme-cab">Cab</button>
+        <button data-theme="cloud" class="theme-button theme-cloud">Cloud</button>
+        <button data-theme="lime" class="theme-button theme-lime">Lime</button>
+        <button data-theme="passion" class="theme-button theme-passion">Passion</button>
+        <button data-theme="blues" class="theme-button theme-blues">Blues</button>
+        <button data-theme="chalk" class="theme-button theme-chalk">Chalk</button>
+        <button data-theme="tron" class="theme-button theme-tron">Tron</button>
+        <button data-theme="paper" class="theme-button theme-paper">Paper</button>
+        <button data-theme="initial" class="theme-button theme-initial">Initial</button>
+      </div>
+    </div>
+  </section>
 
   <div id="keyword"></div>
 
@@ -328,22 +356,13 @@
     </section>
   </main>
 
-  <footer id="footer">
-    <div id="theme-selector">
-      <button data-theme="blackboard" class="theme-button theme-blackboard">Blackboard</button>
-      <button data-theme="gazette" class="theme-button theme-gazette">Gazette</button>
-      <button data-theme="espresso" class="theme-button theme-espresso">Espresso</button>
-      <button data-theme="cab" class="theme-button theme-cab">Cab</button>
-      <button data-theme="cloud" class="theme-button theme-cloud">Cloud</button>
-      <button data-theme="lime" class="theme-button theme-lime">Lime</button>
-      <button data-theme="passion" class="theme-button theme-passion">Passion</button>
-      <button data-theme="blues" class="theme-button theme-blues">Blues</button>
-      <button data-theme="chalk" class="theme-button theme-chalk">Chalk</button>
-      <button data-theme="tron" class="theme-button theme-tron">Tron</button>
-      <button data-theme="paper" class="theme-button theme-paper">Paper</button>
-      <button data-theme="initial" class="theme-button theme-initial">Initial</button>
-    </div>
+  <div id="modal_init">
+    <a class="btn" href="#modal">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2M6 7h12v2H6zm0 4h12v2H6zm0 4h12v2H6z"/></svg>
+    </a>
+  </div>
 
+  <footer id="footer">
     <div class="footer-info">
       <span>Project: <a href="https://github.com/Skyline-Gazer/sui2">Skyline-Gazer/sui2</a></span>
       <span>Icons: <a href="https://icon-sets.iconify.design/mdi/">Iconify MDI</a></span>
