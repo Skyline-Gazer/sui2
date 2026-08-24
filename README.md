@@ -19,7 +19,7 @@ See how keyboard navigation works in action:
 │   ├── js/              # client-side modules (main, search, themer, date, client-info)
 │   │   └── __tests__/   # unit tests, colocated next to the code
 │   ├── scss/            # styles (styles.scss + partials)
-│   ├── public/          # static assets copied to dist/ as-is (icon, robots.txt, _redirects)
+│   ├── public/          # static assets copied to dist/ as-is (icons, robots.txt)
 │   ├── icons.js         # iconify helper used at build time
 │   ├── index.html       # startpage entry (built by Vite)
 │   ├── 404.html         # custom 404 page (built by Vite)
@@ -61,12 +61,12 @@ To build the project, simply follow the steps below.
    | Build command | `npm run build` |
    | Build output directory | `dist` |
 
-4. Add a `NODE_VERSION` environment variable (e.g. `22` or newer) — Vite 8 requires Node.js ≥ 20.19 and Cloudflare's default may be too old.
-5. Deploy. The custom 404 page (`dist/404.html`) and `_redirects` are picked up automatically, so unmatched routes show the project's own 404 page.
+4. Cloudflare reads `.node-version` from the repository and uses Node.js 26 for the build.
+5. Deploy. Cloudflare Pages automatically serves the top-level `dist/404.html` for unmatched routes; no `_redirects` rewrite is required.
 
 > Note: unlike Vercel's `vercel.json` or Netlify's `netlify.toml`, Cloudflare Pages does **not** support a config file in the repository — the build settings above live in the Cloudflare dashboard and must be set there.
 
-If you are happy with the look and functionality of sui2, it is recommended to use this project as a submodule rather than fork it. Please checkout [reorx/start](https://github.com/reorx/start) as an example for how to use it in another project, and how to build with GitHub Actions and deploy to Cloudflare Pages.
+If you are happy with the look and functionality of sui2, it is recommended to use this project as a submodule rather than fork it. See [markd3ng/start](https://github.com/markd3ng/start) for an example that builds and deploys through Cloudflare Pages Git Integration.
 
 ## Deploy using Docker
 
