@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import { getIconData, iconToSVG, replaceIDs } from '@iconify/utils';
 
-const iconsPath = resolve(import.meta.dirname, 'node_modules/@iconify-json/mdi/icons.json')
+const iconsPath = resolve(import.meta.dirname, '../node_modules/@iconify-json/mdi/icons.json')
 const iconsData = JSON.parse(readFileSync(iconsPath))
 // console.log(Object.keys(iconsData))
 

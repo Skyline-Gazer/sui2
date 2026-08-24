@@ -50,7 +50,7 @@ if (!fs.existsSync(dataDir)) {
 
 if (!fs.existsSync(dataFilePath)) {
   console.log('copy example file to DATA_DIR')
-  fs.copyFileSync(path.resolve(buildDir, 'data.example.json'), dataFilePath)
+  fs.copyFileSync(path.resolve(buildDir, 'src/data.example.json'), dataFilePath)
 }
 
 if (!fs.existsSync(path.resolve(outDir, 'index.html')) &&
