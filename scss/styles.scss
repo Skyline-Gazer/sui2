@@ -120,8 +120,8 @@ a:hover {
   margin-left: auto;
   margin-right: auto;
   margin-top: 5vh;
-  width: 60%;
-  min-width: 800px;
+  width: 90%;
+  max-width: 1400px;
 }
 
 /* SECTIONS */
@@ -256,13 +256,7 @@ a:hover {
 
 @media screen and (max-width: 960px) {
   #container {
-    // display: grid;
-    // grid-column-gap: 10px;
-    // grid-row-gap: 0px;
-    // grid-template-columns: 1fr;
-    // grid-template-rows: 80px auto;
     width: 90%;
-    min-width: initial;
   }
 
   .apps_loop {
@@ -276,7 +270,6 @@ a:hover {
 
   #footer {
     width: 90%;
-    min-width: initial;
   }
 }
 
