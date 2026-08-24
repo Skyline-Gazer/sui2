@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parseCloudflareTrace } from "../js/client-info.js";
+import { parseCloudflareTrace } from "../client-info.js";
 
 test("parses IPv4 trace fields in any order", () => {
   assert.deepEqual(parseCloudflareTrace("loc=gb\ncolo=LHR\nip=203.0.113.42\n"), {

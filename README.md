@@ -11,6 +11,27 @@ See how keyboard navigation works in action:
 <video src="https://user-images.githubusercontent.com/405972/193420471-7454270e-7bcc-43cc-a61d-e8b65e6b09f3.mov"></video>
 
 
+## Project structure
+
+```
+.
+├── src/                 # frontend source (the Vite project)
+│   ├── js/              # client-side modules (main, search, themer, date, client-info)
+│   │   └── __tests__/   # unit tests, colocated next to the code
+│   ├── scss/            # styles (styles.scss + partials)
+│   ├── public/          # static assets copied to dist/ as-is (icon, robots.txt, _redirects)
+│   ├── icons.js         # iconify helper used at build time
+│   ├── index.html       # startpage entry (built by Vite)
+│   ├── 404.html         # custom 404 page (built by Vite)
+│   └── data.example.json
+├── live-server/         # independent express + monaco editor sub-package
+├── docs/                # documentation assets
+├── vite.config.js       # build config
+├── package.json
+├── Dockerfile, Makefile, fly.toml
+└── .github/workflows/   # CI/CD
+```
+
 ## Deploy to any static hosting
 
 sui2 uses Vite to build a staic website, which means it's nothing but vanilla HTML/CSS/JavaScript that could be deployed to anywhere you want.
@@ -20,7 +41,8 @@ To build the project, simply follow the steps below.
 1. Install dependencies: `npm i`
 2. Create you own `data.json`
 
-   sui2 get all the data it requires from `data.json`, you can make a copy from `data.example.json`, and then edit it with your own applications and bookmarks.
+   sui2 get all the data it requires from `data.json`, you can make a copy from
+   `src/data.example.json`, and then edit it with your own applications and bookmarks.
 3. Build the result: `npm run build`
 
    The result will be stored in the `dist` folder
@@ -54,7 +76,7 @@ sui2 provides a Docker image that runs a NodeJS server,
 which not only servers the startpage directly,
 but also gives you an interface to edit and build the startpage lively.
 
-![SUI2 Live Editor](images/live-editor.png)
+![SUI2 Live Editor](docs/live-editor.png)
 
 The image is built from this repository and published to GitHub Container Registry at: [ghcr.io/skyline-gazer/sui2](https://github.com/Skyline-Gazer/sui2/pkgs/container/sui2)
 
@@ -90,7 +112,7 @@ see [Automatic platform ARGs in the global scope](https://docs.docker.com/engine
 
 ## `data.json` editing
 
-There's a full example in [data.example.json](https://github.com/Skyline-Gazer/sui2/blob/master/data.example.json),
+There's a full example in [data.example.json](https://github.com/Skyline-Gazer/sui2/blob/master/src/data.example.json),
 it's self explanatory so I'm not going to write too much about it, maybe a json schema will be created as a supplement in the future.
 
 The only thing worth mentioning here is the `icon` attribute,

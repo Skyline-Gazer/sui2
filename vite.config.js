@@ -3,7 +3,7 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import handlebars from 'vite-plugin-handlebars'
 import { VitePWA } from 'vite-plugin-pwa'
-import { getIconSVG } from './icons'
+import { getIconSVG } from './src/icons'
 
 // envs
 const DATA_FILE = process.env.DATA_FILE,
@@ -23,7 +23,7 @@ try {
 } catch (e) {
   if (e.code === 'ENOENT' && !DATA_FILE) {
     console.log('data.json missing, fall back to data.example.json')
-    data = await import('./data.example.json')
+    data = await import('./src/data.example.json')
   } else {
     throw e;
   }
@@ -51,16 +51,21 @@ if (WEBMANIFEST_SCOPE) {
 }
 
 export default defineConfig({
+  // frontend source is under src/ (html entries, scss, js, public)
+  root: "src",
   // use relative path for assets
   base: "",
   build: {
     // put assets in the same folder as index.html
     assetsDir: ".",
-    outDir: OUT_DIR || 'dist',
+    // outDir is resolved relative to root (src/), so back up to the repo dist/
+    outDir: OUT_DIR || "../dist",
+    // outDir lives outside root (src/); make sure a rebuild empties stale files
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(import.meta.dirname, 'index.html'),
-        page404: resolve(import.meta.dirname, '404.html'),
+        main: resolve(import.meta.dirname, 'src/index.html'),
+        page404: resolve(import.meta.dirname, 'src/404.html'),
       },
     },
   },
