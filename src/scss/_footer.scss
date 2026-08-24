@@ -1,4 +1,4 @@
-/* PAGE FOOTER (theme selector + project info) */
+/* PAGE FOOTER (project + icons info) */
 
 #footer {
   margin-left: auto;
@@ -30,11 +30,4 @@
 #client-network-info {
   min-width: 0;
   overflow-wrap: anywhere;
-}
-
-#theme-selector {
-  display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(var(--theme-column-count), minmax(0, 1fr));
-  margin-bottom: 2em;
 }
