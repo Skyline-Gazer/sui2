@@ -21,6 +21,7 @@
     },
     {
       "name": "TV",
+      "collapse": true,
       "items": [
         {"name":"Plex","url":"http://play.example.com","icon":"plex"},
         {"name":"Radarr","url":"http://movies.example.com","icon":"filmstrip"},

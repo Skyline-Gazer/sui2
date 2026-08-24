@@ -38,8 +38,40 @@ function loadSearchItems() {
   })
 }
 
+// details that the search itself expanded, mapped to
+// { wasOpen, userTouched }:
+//  - wasOpen: whether the category was open before the search touched it
+//  - userTouched: set when the user clicks the category header (summary)
+//    during the search — the only reliable signal of manual intent,
+//    because the browser may coalesce multiple open-state changes into a
+//    single 'toggle' event, which cannot distinguish programmatic
+//    changes from user clicks
+// On clearing the search, only untouched categories that were initially
+// closed and are still open are rolled back.
+const searchOpened = new Map()
+// every category the user clicked during the search session, even before
+// the search first matched an item inside it — so a category the user
+// already folded is never force-opened when it later becomes a match
+const userClicked = new Set()
+
+function onSummaryClick(d) {
+  userClicked.add(d)
+  const info = searchOpened.get(d)
+  if (info) info.userTouched = true
+}
+
 const keywordEl = document.getElementById("keyword")
-const regularCharsRe = /\w/
+
+function renderKeyword() {
+  // render with DOM APIs so arbitrary input (incl. CJK and punctuation)
+  // cannot inject HTML
+  keywordEl.textContent = ''
+  if (store.keyword) {
+    const span = document.createElement('span')
+    span.textContent = store.keyword
+    keywordEl.appendChild(span)
+  }
+}
 
 function updateKeyword(key) {
   // Backspace
@@ -50,20 +82,36 @@ function updateKeyword(key) {
   } else if (key === 'Escape') {  // ESC
     store.keyword = ''
   } else {
-    // e.key already gives the character; keep only single word chars
-    if (key.length === 1 && regularCharsRe.test(key)) {
+    // accept any single character (CJK, punctuation, latin, ...);
+    // multi-character keys (Shift, IME composing, ...) are skipped
+    if (key.length === 1) {
       store.keyword = store.keyword + key
     }
   }
-  if (store.keyword) {
-    keywordEl.innerHTML = `<span>${store.keyword}</span>`
-  } else {
-    keywordEl.innerHTML = ''
-  }
+  renderKeyword()
   return store.keyword
 }
 
+// IME (CJK) input: keydown only reports 'Process' while composing, so the
+// committed text arrives via the compositionend event
+let inComposition = false
+
+function handleCompositionEnd(e) {
+  inComposition = false
+  if (e.data) {
+    store.keyword = store.keyword + e.data
+    renderKeyword()
+    const items = store.fuse.search(store.keyword)
+    handleMatchedItems(items)
+  } else if (!store.keyword) {
+    // IME commit cancelled with an empty keyword: reset like a normal
+    // cleared search (consistent with the keydown path)
+    resetSearchState()
+  }
+}
+
 function handleKeyPress(e) {
+  if (inComposition) return
   if (e.ctrlKey || e.metaKey || e.altKey) {
     // ignore key combination
     return
@@ -74,34 +122,82 @@ function handleKeyPress(e) {
   } else {
     const oldKeyword = store.keyword
     const keyword = updateKeyword(e.key)
-    // ignore empty
-    if (oldKeyword === keyword && keyword === '') return
 
-    // only search when keyword changes
+    // only act when the keyword changes
     if (keyword !== oldKeyword) {
-      const items = store.fuse.search(keyword)
-      handleMatchedItems(items)
+      if (keyword) {
+        const items = store.fuse.search(keyword)
+        handleMatchedItems(items)
+      } else {
+        // search cleared (Escape / Backspace): restore the UI state
+        resetSearchState()
+      }
     }
   }
 }
 
-function handleMatchedItems(items) {
-  document.activeElement.blur();
-  // reset tabindex and name text
-  const matchedClass = 'matched'
+const matchedClass = 'matched'
+
+function resetItems() {
   store.searchItems.forEach(item => {
     item.el.setAttribute('tabindex', 0)
     item.nameEl.textContent = item.name
     item.el.classList.remove(matchedClass)
   })
+}
+
+// restore the search UI; roll back only the category expansions the
+// search itself caused and the user never manually touched (and only
+// those still open), so manual user toggles are always preserved
+function resetSearchState() {
+  resetItems()
+  searchOpened.forEach((info, details) => {
+    if (!info.userTouched && !info.wasOpen && details.open) details.open = false
+  })
+  searchOpened.clear()
+  userClicked.clear()
+}
+
+function handleMatchedItems(items) {
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+  resetItems()
+
+  // focus the first *visible* match (its category may be folded away by
+  // the user's own choice, in which case a later match takes the focus)
+  let focused = false
 
   items.forEach((i, index) => {
     const item = i.item
-    if (index === 0) {
-      item.el.focus();
+    // expand the collapsed category (details) so the matched item is visible,
+    // but never force-open a category the user manually toggled during the
+    // search — their latest choice wins (items there are still highlighted)
+    const details = item.el.closest('details')
+    const hidden = details && !details.open
+    if (details) {
+      let info = searchOpened.get(details)
+      if (!info) {
+        // remember the state before the search first touched this category;
+        // clicks made before the first match also count as user intent
+        info = {wasOpen: details.open, userTouched: userClicked.has(details)}
+        searchOpened.set(details, info)
+      }
+      if (!info.userTouched && !details.open) {
+        details.open = true
+      }
     }
-    const tabindex = index + 1
-    item.el.setAttribute('tabindex', tabindex)
+    // never focus or tab into a match inside a collapsed category
+    // (the item is not visible; it is still highlighted)
+    const visible = details ? details.open : true
+    if (!focused && visible) {
+      item.el.focus();
+      focused = true
+    }
+    if (visible) {
+      const tabindex = index + 1
+      item.el.setAttribute('tabindex', tabindex)
+    }
     item.el.classList.add(matchedClass)
 
     // because we only have one key to match when initializing Fuse,
@@ -111,6 +207,8 @@ function handleMatchedItems(items) {
 }
 
 function highlightText(el, match) {
+  // no match data: leave the text as-is instead of crashing
+  if (!match || !match.indices || !match.indices.length) return
   // get the longest part
   match.indices.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]))
   const pos = match.indices[0]
@@ -128,4 +226,15 @@ function highlightText(el, match) {
 export function initKeyboardSearch() {
   loadSearchItems()
   document.addEventListener('keydown', handleKeyPress);
+  // CJK IME: ignore keydown while composing, apply the committed text on end
+  document.addEventListener('compositionstart', () => { inComposition = true })
+  document.addEventListener('compositionend', handleCompositionEnd)
+  // track manual open/close during a search: only the user's click on a
+  // category header is a reliable signal (a single 'toggle' event may
+  // coalesce several state changes and cannot tell them apart)
+  document.querySelectorAll('.apps, .links_category').forEach(d => {
+    d.addEventListener('click', (e) => {
+      if (e.target.closest('summary')) onSummaryClick(d)
+    })
+  })
 }
