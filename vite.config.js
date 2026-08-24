@@ -12,6 +12,8 @@ const DATA_FILE = process.env.DATA_FILE,
   WEBMANIFEST_DESCRIPTION = process.env.WEBMANIFEST_DESCRIPTION,
   WEBMANIFEST_SHORT_NAME = process.env.WEBMANIFEST_SHORT_NAME,
   WEBMANIFEST_SCOPE = process.env.WEBMANIFEST_SCOPE,
+  SITE_URL = process.env.SITE_URL,
+  ALLOW_SEARCH_INDEXING = process.env.ALLOW_SEARCH_INDEXING,
   NO_PWA = process.env.NO_PWA;
 
 let dataFile = DATA_FILE || './data.json'
@@ -29,8 +31,57 @@ try {
   }
 }
 
+const absoluteHttpUrl = (value) => {
+  if (typeof value !== 'string' || !value.trim()) return undefined
+
+  try {
+    const url = new URL(value)
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : undefined
+  } catch {
+    return undefined
+  }
+}
+
+const nonEmptyString = (value) =>
+  typeof value === 'string' && value.trim() ? value.trim() : undefined
+
+data = {
+  ...data,
+  title: nonEmptyString(data.title) || 'SUI2',
+  description: nonEmptyString(data.description) || 'A customizable startpage for your server or new tab.',
+  siteUrl: absoluteHttpUrl(SITE_URL) || absoluteHttpUrl(data.siteUrl),
+  allowSearchIndexing: ALLOW_SEARCH_INDEXING === 'true' || data.allowSearchIndexing === true,
+}
+
+const structuredData = (site) => {
+  const title = typeof site.title === 'string' ? site.title : 'SUI2'
+  const description = typeof site.description === 'string' ? site.description : undefined
+  const siteUrl = absoluteHttpUrl(site.siteUrl)
+  const websiteId = siteUrl ? `${siteUrl}#website` : undefined
+
+  const website = {
+    '@type': 'WebSite',
+    name: title,
+    ...(description ? { description } : {}),
+    ...(siteUrl ? { url: siteUrl, '@id': websiteId } : {}),
+  }
+
+  const page = {
+    '@type': 'CollectionPage',
+    name: title,
+    ...(description ? { description } : {}),
+    ...(siteUrl ? { url: siteUrl, '@id': `${siteUrl}#webpage` } : {}),
+    ...(websiteId ? { isPartOf: { '@id': websiteId } } : {}),
+  }
+
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [website, page],
+  }).replace(/</g, '\\u003c')
+}
+
 const manifest = {
-  "name": WEBMANIFEST_NAME || "SUI2",
+  "name": WEBMANIFEST_NAME || data.title,
   "short_name": WEBMANIFEST_SHORT_NAME || "sui2",
   "description": WEBMANIFEST_DESCRIPTION || "a startpage for your server and / or new tab page",
   "icons": [
@@ -43,6 +94,21 @@ const manifest = {
   "scope": "/",
   "start_url": "/",
   "display": "standalone"
+}
+
+const robotsTxt = data.allowSearchIndexing
+  ? 'User-agent: *\nAllow: /\n'
+  : 'User-agent: *\nDisallow: /\n'
+
+const seoFiles = {
+  name: 'sui2-seo-files',
+  generateBundle() {
+    this.emitFile({
+      type: 'asset',
+      fileName: 'robots.txt',
+      source: robotsTxt,
+    })
+  },
 }
 
 if (WEBMANIFEST_SCOPE) {
@@ -70,6 +136,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    seoFiles,
     NO_PWA ? null
     : VitePWA({
       injectRegister: 'auto',
@@ -101,7 +168,8 @@ export default defineConfig({
             // invalid URL in data file should not break the build
             return url
           }
-        }
+        },
+        structuredData: () => structuredData(data),
       }
     }),
   ].filter(x => x !== null),
