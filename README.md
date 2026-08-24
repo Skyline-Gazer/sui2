@@ -98,6 +98,8 @@ it uses the [MDI icon set from Iconify](https://icon-sets.iconify.design/mdi/), 
 
 An `apps` or `bookmarks` category can be collapsed by default by setting `"collapse": true` on it (e.g. `{"name": "TV", "collapse": true, ...}`). Categories without this flag stay expanded as before.
 
+An app can be placed in the desktop grid's right-aligned fifth column by setting `"rightAligned": true` on that item. This is useful for a small group of services that should share the clock's right edge; on tablet and mobile layouts, the item returns to the normal grid flow.
+
 ## Development
 
 Developing the startpage is easy, first clone the project, then run the following:

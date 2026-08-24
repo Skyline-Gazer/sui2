@@ -120,8 +120,8 @@ a:hover {
   margin-left: auto;
   margin-right: auto;
   margin-top: 5vh;
-  width: 90%;
-  max-width: 1400px;
+  width: 60%;
+  min-width: 800px;
 }
 
 /* SECTIONS */
@@ -155,8 +155,9 @@ a:hover {
   display: grid;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 64px;
+  grid-auto-flow: row dense;
+  grid-auto-rows: 64px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   padding-bottom: var(--module-spacing);
 }
 
@@ -178,10 +179,8 @@ a:hover {
 
   .apps_item {
     display: flex;
-    width: 100%;
-    /* 左/上/下保留 --edge-gap，右侧去 padding 使最后一个 item 的内容
-       顶到容器右缘，与右上角时钟的右边缘对齐 */
-    padding: var(--edge-gap) var(--edge-gap) var(--edge-gap) 0;
+    min-width: 0;
+    padding: var(--edge-gap);
     margin-left: calc(0px - var(--edge-gap));
     height: 55px;
 
@@ -195,15 +194,18 @@ a:hover {
     }
   }
 
-  // The visible end of the last app in each row—not merely its grid cell—uses
-  // the same right edge as the clock's final second digit.
-  .apps_item_wrap:nth-child(4n) .apps_item {
+  &.apps_item_wrap--right-aligned {
+    grid-column: 5;
     justify-content: flex-end;
-  }
 
-  .apps_item_wrap:nth-child(4n) .apps_text {
-    flex: 0 1 auto;
-    text-align: right;
+    .apps_item {
+      padding-right: 0;
+    }
+
+    .apps_text {
+      flex: 0 1 auto;
+      text-align: right;
+    }
   }
 
   .apps_icon {
@@ -211,6 +213,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
+
     svg {
       width: 32px;
       height: 32px;
@@ -219,9 +222,9 @@ a:hover {
 
   .apps_text {
     display: flex;
+    flex: 1;
     flex-direction: column;
     justify-content: center;
-    flex: 1;
     min-width: 0;
     overflow: hidden;
     line-height: 1.3em;
@@ -272,28 +275,25 @@ a:hover {
 @media screen and (max-width: 960px) {
   #container {
     width: 90%;
+    min-width: initial;
   }
 
   .apps_loop {
     grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
 
-    .apps_item_wrap:nth-child(4n) .apps_item {
+    .apps_item_wrap--right-aligned {
+      grid-column: auto;
       justify-content: flex-start;
-    }
 
-    .apps_item_wrap:nth-child(4n) .apps_text {
-      flex: 1;
-      text-align: left;
-    }
+      .apps_item {
+        padding-right: var(--edge-gap);
+      }
 
-    .apps_item_wrap:nth-child(3n) .apps_item {
-      justify-content: flex-end;
-    }
-
-    .apps_item_wrap:nth-child(3n) .apps_text {
-      flex: 0 1 auto;
-      text-align: right;
+      .apps_text {
+        flex: 1;
+        text-align: left;
+      }
     }
   }
 
@@ -303,6 +303,7 @@ a:hover {
 
   #footer {
     width: 90%;
+    min-width: initial;
   }
 }
 
@@ -317,23 +318,6 @@ a:hover {
     grid-template-columns: 1fr 1fr;
     width: 100%;
 
-    .apps_item_wrap:nth-child(3n) .apps_item {
-      justify-content: flex-start;
-    }
-
-    .apps_item_wrap:nth-child(3n) .apps_text {
-      flex: 1;
-      text-align: left;
-    }
-
-    .apps_item_wrap:nth-child(2n) .apps_item {
-      justify-content: flex-end;
-    }
-
-    .apps_item_wrap:nth-child(2n) .apps_text {
-      flex: 0 1 auto;
-      text-align: right;
-    }
   }
 
   #links_loop {
