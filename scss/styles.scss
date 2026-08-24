@@ -177,7 +177,9 @@ a:hover {
   .apps_item {
     display: flex;
     width: 100%;
-    padding: var(--edge-gap);
+    /* 左/上/下保留 --edge-gap，右侧去 padding 使最后一个 item 的内容
+       顶到容器右缘，与右上角时钟的右边缘对齐 */
+    padding: var(--edge-gap) var(--edge-gap) var(--edge-gap) 0;
     margin-left: calc(0px - var(--edge-gap));
     height: 55px;
 
