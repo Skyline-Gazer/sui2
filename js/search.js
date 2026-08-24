@@ -38,11 +38,24 @@ function loadSearchItems() {
   })
 }
 
-// details that the search itself expanded, mapped to whether they were
-// open before the search touched them. When the search is cleared, only
-// these are rolled back (and only while they are still open), so manual
-// user toggles — before or during the search — are always preserved.
+// details that the search itself expanded, mapped to
+// { wasOpen, userTouched }:
+//  - wasOpen: whether the category was open before the search touched it
+//  - userTouched: set by the 'toggle' event when the user manually opened
+//    or closed the category during the search
+// On clearing the search, only untouched categories that were initially
+// closed and are still open are rolled back.
 const searchOpened = new Map()
+// details whose open state was changed by the search code itself; the
+// 'toggle' event fires asynchronously, so this distinguishes programmatic
+// changes from manual user toggles
+const pendingProgrammatic = new Set()
+
+function onDetailsToggle(d) {
+  if (pendingProgrammatic.delete(d)) return
+  const info = searchOpened.get(d)
+  if (info) info.userTouched = true
+}
 
 const keywordEl = document.getElementById("keyword")
 const regularCharsRe = /\w/
@@ -105,12 +118,12 @@ function resetItems() {
 }
 
 // restore the search UI; roll back only the category expansions the
-// search itself caused (and only those still open), so manual user
-// toggles are preserved
+// search itself caused and the user never manually touched (and only
+// those still open), so manual user toggles are always preserved
 function resetSearchState() {
   resetItems()
-  searchOpened.forEach((wasOpen, details) => {
-    if (!wasOpen && details.open) details.open = false
+  searchOpened.forEach((info, details) => {
+    if (!info.userTouched && !info.wasOpen && details.open) details.open = false
   })
   searchOpened.clear()
 }
@@ -126,9 +139,16 @@ function handleMatchedItems(items) {
     if (details) {
       // remember the state before the search first touched this category
       if (!searchOpened.has(details)) {
-        searchOpened.set(details, details.open)
+        searchOpened.set(details, {wasOpen: details.open, userTouched: false})
       }
-      details.open = true
+      // mark the change as programmatic so the async 'toggle' event
+      // does not count it as a manual user toggle; only set when the
+      // state actually changes, otherwise no 'toggle' event fires and
+      // the pending marker would leak and swallow a later user toggle
+      if (!details.open) {
+        pendingProgrammatic.add(details)
+        details.open = true
+      }
     }
     if (index === 0) {
       item.el.focus();
@@ -161,4 +181,9 @@ function highlightText(el, match) {
 export function initKeyboardSearch() {
   loadSearchItems()
   document.addEventListener('keydown', handleKeyPress);
+  // track manual open/close during a search ('toggle' fires on any
+  // open-state change, both user clicks and programmatic changes)
+  document.querySelectorAll('.apps, .links_category').forEach(d => {
+    d.addEventListener('toggle', () => onDetailsToggle(d))
+  })
 }
