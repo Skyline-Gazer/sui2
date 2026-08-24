@@ -3,6 +3,11 @@
 
 :root {
   --edge-gap: 8px;
+  --page-content-width: 60%;
+  --page-content-min-width: 800px;
+  --dashboard-column-count: 5;
+  --dashboard-column-gap: 20px;
+  --theme-column-count: 6;
   --color-link-hover-bg: rgba(205, 205, 205, 0.5);
   --color-text-matched: rgb(188, 29, 29);
 }
@@ -111,7 +116,7 @@ a:hover {
 
 #container {
   display: grid;
-  grid-column-gap: 20px;
+  grid-column-gap: var(--dashboard-column-gap);
   grid-row-gap: 3vh;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
@@ -120,8 +125,8 @@ a:hover {
   margin-left: auto;
   margin-right: auto;
   margin-top: 5vh;
-  width: 60%;
-  min-width: 800px;
+  width: var(--page-content-width);
+  min-width: var(--page-content-min-width);
 }
 
 /* SECTIONS */
@@ -143,20 +148,30 @@ a:hover {
 }
 
 #header_date {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(var(--dashboard-column-count), minmax(0, 1fr));
+  column-gap: var(--dashboard-column-gap);
+
+  .date {
+    grid-column: 1 / -2;
+    min-width: 0;
+    white-space: nowrap;
+  }
 
   .time {
-    margin-inline-start: auto;
+    grid-column: -2 / -1;
+    justify-self: end;
     text-align: right;
+    white-space: nowrap;
   }
 }
 
 .apps_loop {
   display: grid;
-  grid-column-gap: 0px;
+  grid-column-gap: var(--dashboard-column-gap);
   grid-row-gap: 0px;
   grid-auto-rows: 64px;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) max-content;
+  grid-template-columns: repeat(var(--dashboard-column-count), minmax(0, 1fr));
   padding-bottom: var(--module-spacing);
 }
 
@@ -175,13 +190,15 @@ a:hover {
   flex-direction: row;
   flex-wrap: wrap;
   margin: 0;
+  min-width: 0;
 
   .apps_item {
     display: flex;
+    height: 55px;
     min-width: 0;
     padding: var(--edge-gap);
-    margin-left: calc(0px - var(--edge-gap));
-    height: 55px;
+    overflow: hidden;
+    width: 100%;
 
     &:hover,
     &:active {
@@ -194,6 +211,7 @@ a:hover {
   }
 
   .apps_icon {
+    flex: 0 0 auto;
     margin-right: 1em;
     display: flex;
     flex-direction: column;
@@ -216,6 +234,13 @@ a:hover {
     color: var(--color-text-acc);
     font-weight: 500;
 
+    .name,
+    .domain {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .domain {
       font-size: 0.8em;
       font-weight: 400;
@@ -226,15 +251,16 @@ a:hover {
 #links_loop {
   display: grid;
   flex-wrap: nowrap;
-  grid-column-gap: 20px;
+  grid-column-gap: var(--dashboard-column-gap);
   grid-row-gap: 0px;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) max-content;
+  grid-template-columns: repeat(var(--dashboard-column-count), minmax(0, 1fr));
   grid-template-rows: auto;
 }
 
 .links_category {
   line-height: 1.5rem;
   margin-bottom: 2em;
+  min-width: 0;
   -webkit-font-smoothing: antialiased;
 
   summary {
@@ -248,6 +274,9 @@ a:hover {
   a {
     display: block;
     line-height: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -258,46 +287,41 @@ a:hover {
 /* MEDIA QUERIES */
 
 @media screen and (max-width: 960px) {
-  #container {
-    width: 90%;
-    min-width: initial;
-  }
-
-  .apps_loop {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) max-content;
-    width: 100%;
-
-  }
-
-  #links_loop {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) max-content;
-  }
-
-  #footer {
-    width: 90%;
-    min-width: initial;
+  :root {
+    --page-content-width: 90%;
+    --page-content-min-width: 0px;
+    --dashboard-column-count: 3;
+    --theme-column-count: 3;
   }
 }
 
 @media screen and (max-width: 667px) {
+  :root {
+    --dashboard-column-count: 2;
+    --theme-column-count: 2;
+  }
+
   html {
     font-size: calc(16px + 6 * ((100vw - 320px) / 680));
   }
 
-  .apps_loop {
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    grid-template-columns: minmax(0, 1fr) max-content;
-    width: 100%;
-
+  h1 {
+    font-size: 3em;
   }
 
-  #links_loop {
-    flex-wrap: nowrap;
-    display: grid;
-    grid-column-gap: 20px;
-    grid-row-gap: 0px;
-    grid-template-columns: minmax(0, 1fr) max-content;
-    grid-template-rows: auto;
+  #header_date {
+    height: auto;
+    row-gap: 0.25em;
+
+    .date {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      white-space: normal;
+    }
+
+    .time {
+      grid-column: -2 / -1;
+      grid-row: 2;
+    }
   }
 }
