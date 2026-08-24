@@ -9,5 +9,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   greet()
   bindThemeButtons()
   initKeyboardSearch()
-  setInterval(date, 1000 * 60)
+  setInterval(date, 1000)
 })

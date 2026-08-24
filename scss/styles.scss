@@ -1,4 +1,4 @@
-@use "modal";
+@use "footer";
 @use "theme";
 
 :root {
@@ -272,11 +272,9 @@ a:hover {
     grid-template-columns: 1fr 1fr 1fr;
   }
 
-  #modal > div {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5vh;
+  #footer {
     width: 90%;
+    min-width: initial;
   }
 }
 
