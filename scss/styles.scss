@@ -143,9 +143,11 @@ a:hover {
 }
 
 #header_date {
+  display: flex;
+
   .time {
-    margin-inline-start: 3em;
-    float: right;
+    margin-inline-start: auto;
+    text-align: right;
   }
 }
 
@@ -191,6 +193,17 @@ a:hover {
     &:hover .name {
       text-decoration: underline;
     }
+  }
+
+  // The visible end of the last app in each row—not merely its grid cell—uses
+  // the same right edge as the clock's final second digit.
+  .apps_item_wrap:nth-child(4n) .apps_item {
+    justify-content: flex-end;
+  }
+
+  .apps_item_wrap:nth-child(4n) .apps_text {
+    flex: 0 1 auto;
+    text-align: right;
   }
 
   .apps_icon {
@@ -264,6 +277,24 @@ a:hover {
   .apps_loop {
     grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
+
+    .apps_item_wrap:nth-child(4n) .apps_item {
+      justify-content: flex-start;
+    }
+
+    .apps_item_wrap:nth-child(4n) .apps_text {
+      flex: 1;
+      text-align: left;
+    }
+
+    .apps_item_wrap:nth-child(3n) .apps_item {
+      justify-content: flex-end;
+    }
+
+    .apps_item_wrap:nth-child(3n) .apps_text {
+      flex: 0 1 auto;
+      text-align: right;
+    }
   }
 
   #links_loop {
@@ -285,6 +316,24 @@ a:hover {
     grid-row-gap: 0px;
     grid-template-columns: 1fr 1fr;
     width: 100%;
+
+    .apps_item_wrap:nth-child(3n) .apps_item {
+      justify-content: flex-start;
+    }
+
+    .apps_item_wrap:nth-child(3n) .apps_text {
+      flex: 1;
+      text-align: left;
+    }
+
+    .apps_item_wrap:nth-child(2n) .apps_item {
+      justify-content: flex-end;
+    }
+
+    .apps_item_wrap:nth-child(2n) .apps_text {
+      flex: 0 1 auto;
+      text-align: right;
+    }
   }
 
   #links_loop {
