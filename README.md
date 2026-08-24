@@ -98,6 +98,7 @@ it uses the [MDI icon set from Iconify](https://icon-sets.iconify.design/mdi/), 
 
 An `apps` or `bookmarks` category can be collapsed by default by setting `"collapse": true` on it (e.g. `{"name": "TV", "collapse": true, ...}`). Categories without this flag stay expanded as before.
 
+
 ## Development
 
 Developing the startpage is easy, first clone the project, then run the following:

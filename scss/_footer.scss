@@ -1,0 +1,31 @@
+/* PAGE FOOTER (theme selector + project info) */
+
+#footer {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5vh;
+  width: 60%;
+  min-width: 800px;
+
+  .footer-info {
+    padding-top: 1em;
+    border-top: 1px solid var(--color-text-acc);
+    color: var(--color-text-acc);
+    font-size: 0.9em;
+
+    a {
+      margin-right: 1.5em;
+      color: var(--color-text-acc);
+    }
+
+    a:hover {
+      color: var(--color-text-pri);
+    }
+  }
+}
+
+#theme-selector {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 2em;
+}
