@@ -17,6 +17,8 @@ const DATA_FILE = process.env.DATA_FILE,
 let dataFile = DATA_FILE || './data.json'
 console.log('use DATA_FILE: ', dataFile)
 
+const appHomeUrl = WEBMANIFEST_SCOPE || '/'
+
 var data
 try {
   data = JSON.parse(readFileSync(dataFile))
@@ -83,7 +85,7 @@ export default defineConfig({
       manifest,
     }),
     handlebars({
-      context: data,
+      context: { ...data, appHomeUrl },
       helpers: {
         iconify: (name) => {
           const svg = getIconSVG(name)
