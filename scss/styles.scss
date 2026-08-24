@@ -155,7 +155,6 @@ a:hover {
   display: grid;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
-  grid-auto-flow: row dense;
   grid-auto-rows: 64px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   padding-bottom: var(--module-spacing);
@@ -194,20 +193,6 @@ a:hover {
     }
   }
 
-  &.apps_item_wrap--right-aligned {
-    grid-column: 5;
-    justify-content: flex-end;
-
-    .apps_item {
-      padding-right: 0;
-    }
-
-    .apps_text {
-      flex: 0 1 auto;
-      text-align: right;
-    }
-  }
-
   .apps_icon {
     margin-right: 1em;
     display: flex;
@@ -243,7 +228,7 @@ a:hover {
   flex-wrap: nowrap;
   grid-column-gap: 20px;
   grid-row-gap: 0px;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   grid-template-rows: auto;
 }
 
@@ -282,23 +267,10 @@ a:hover {
     grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
 
-    .apps_item_wrap--right-aligned {
-      grid-column: auto;
-      justify-content: flex-start;
-
-      .apps_item {
-        padding-right: var(--edge-gap);
-      }
-
-      .apps_text {
-        flex: 1;
-        text-align: left;
-      }
-    }
   }
 
   #links_loop {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   #footer {
@@ -325,7 +297,7 @@ a:hover {
     display: grid;
     grid-column-gap: 20px;
     grid-row-gap: 0px;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: auto;
   }
 }
