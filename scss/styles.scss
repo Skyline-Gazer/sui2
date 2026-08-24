@@ -155,8 +155,6 @@ a:hover {
   .date {
     grid-column: 1 / -2;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -309,5 +307,21 @@ a:hover {
 
   h1 {
     font-size: 3em;
+  }
+
+  #header_date {
+    height: auto;
+    row-gap: 0.25em;
+
+    .date {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      white-space: normal;
+    }
+
+    .time {
+      grid-column: -2 / -1;
+      grid-row: 2;
+    }
   }
 }
