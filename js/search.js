@@ -61,7 +61,17 @@ function onSummaryClick(d) {
 }
 
 const keywordEl = document.getElementById("keyword")
-const regularCharsRe = /\w/
+
+function renderKeyword() {
+  // render with DOM APIs so arbitrary input (incl. CJK and punctuation)
+  // cannot inject HTML
+  keywordEl.textContent = ''
+  if (store.keyword) {
+    const span = document.createElement('span')
+    span.textContent = store.keyword
+    keywordEl.appendChild(span)
+  }
+}
 
 function updateKeyword(key) {
   // Backspace
@@ -72,20 +82,31 @@ function updateKeyword(key) {
   } else if (key === 'Escape') {  // ESC
     store.keyword = ''
   } else {
-    // e.key already gives the character; keep only single word chars
-    if (key.length === 1 && regularCharsRe.test(key)) {
+    // accept any single character (CJK, punctuation, latin, ...);
+    // multi-character keys (Shift, IME composing, ...) are skipped
+    if (key.length === 1) {
       store.keyword = store.keyword + key
     }
   }
-  if (store.keyword) {
-    keywordEl.innerHTML = `<span>${store.keyword}</span>`
-  } else {
-    keywordEl.innerHTML = ''
-  }
+  renderKeyword()
   return store.keyword
 }
 
+// IME (CJK) input: keydown only reports 'Process' while composing, so the
+// committed text arrives via the compositionend event
+let inComposition = false
+
+function handleCompositionEnd(e) {
+  inComposition = false
+  if (!e.data) return
+  store.keyword = store.keyword + e.data
+  renderKeyword()
+  const items = store.fuse.search(store.keyword)
+  handleMatchedItems(items)
+}
+
 function handleKeyPress(e) {
+  if (inComposition) return
   if (e.ctrlKey || e.metaKey || e.altKey) {
     // ignore key combination
     return
@@ -142,6 +163,7 @@ function handleMatchedItems(items) {
     // but never force-open a category the user manually toggled during the
     // search — their latest choice wins (items there are still highlighted)
     const details = item.el.closest('details')
+    const hidden = details && !details.open
     if (details) {
       let info = searchOpened.get(details)
       if (!info) {
@@ -154,11 +176,15 @@ function handleMatchedItems(items) {
         details.open = true
       }
     }
-    if (index === 0) {
+    // never focus or tab into a match inside a collapsed category
+    // (the item is not visible; it is still highlighted)
+    if (index === 0 && !hidden) {
       item.el.focus();
     }
-    const tabindex = index + 1
-    item.el.setAttribute('tabindex', tabindex)
+    if (!hidden) {
+      const tabindex = index + 1
+      item.el.setAttribute('tabindex', tabindex)
+    }
     item.el.classList.add(matchedClass)
 
     // because we only have one key to match when initializing Fuse,
@@ -187,6 +213,9 @@ function highlightText(el, match) {
 export function initKeyboardSearch() {
   loadSearchItems()
   document.addEventListener('keydown', handleKeyPress);
+  // CJK IME: ignore keydown while composing, apply the committed text on end
+  document.addEventListener('compositionstart', () => { inComposition = true })
+  document.addEventListener('compositionend', handleCompositionEnd)
   // track manual open/close during a search: only the user's click on a
   // category header is a reliable signal (a single 'toggle' event may
   // coalesce several state changes and cannot tell them apart)
