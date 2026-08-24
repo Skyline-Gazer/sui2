@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "rm -rf dist && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test"
   },
   "devDependencies": {
     "@iconify-json/mdi": "^1.2.3",
