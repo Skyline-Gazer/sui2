@@ -9,9 +9,18 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    permissions:
+      # actions-gh-pages pushes the built site to the gh-pages branch.
+      # deploy: false below means we only write that branch; the push itself
+      # is what triggers GitHub's own branch-based Pages build. We deliberately
+      # DON'T create a GitHub deployment (environment: github-pages), because
+      # Pages is configured branch-based ("Deploy from a branch") and that
+      # deployment queue would fight the built-in workflow and stall forever.
+      contents: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v7
 
@@ -43,9 +52,12 @@ jobs:
         env:
           WEBMANIFEST_SCOPE: /sui2/
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        if: ${{ github.ref == 'refs/heads/master' }}
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
         with:
+          # Pure branch push only: do NOT create a GitHub Pages deployment/status
+          # (that is handled by the built-in "pages-build-deployment" workflow
+          # that watches the gh-pages branch).
+          deploy: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
