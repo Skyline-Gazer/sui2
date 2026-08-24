@@ -134,18 +134,21 @@ function handleMatchedItems(items) {
 
   items.forEach((i, index) => {
     const item = i.item
-    // expand the collapsed category (details) so the matched item is visible
+    // expand the collapsed category (details) so the matched item is visible,
+    // but never force-open a category the user manually toggled during the
+    // search — their latest choice wins (items there are still highlighted)
     const details = item.el.closest('details')
     if (details) {
-      // remember the state before the search first touched this category
-      if (!searchOpened.has(details)) {
+      const info = searchOpened.get(details)
+      if (!info) {
+        // remember the state before the search first touched this category
         searchOpened.set(details, {wasOpen: details.open, userTouched: false})
       }
       // mark the change as programmatic so the async 'toggle' event
       // does not count it as a manual user toggle; only set when the
       // state actually changes, otherwise no 'toggle' event fires and
       // the pending marker would leak and swallow a later user toggle
-      if (!details.open) {
+      if (!(info && info.userTouched) && !details.open) {
         pendingProgrammatic.add(details)
         details.open = true
       }
