@@ -18,7 +18,8 @@
   }
 
   > div {
-    background-color: #ffffff;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-text-pri, #333333);
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.25);
     margin-left: auto;
     margin-right: auto;
@@ -30,14 +31,14 @@
   }
 
   h1 {
-    color: #333333;
+    color: inherit;
     font-size: 2em;
     margin: 0 0 .5em;
   }
 
   h2 {
     margin: 1em 0 .5em;
-    color: initial;
+    color: inherit;
   }
 
   header {
@@ -47,14 +48,14 @@
 }
 
 .modal-close {
-  color: #000000;
+  color: var(--color-text-pri, #000000);
   font-size: 1.5em;
   text-align: center;
   text-decoration: none;
 }
 
 .modal-close:hover {
-  color: #000;
+  color: var(--color-text-acc, #000000);
 }
 
 #modal_init a {
@@ -69,8 +70,9 @@
 }
 
 #modal-theme {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(var(--theme-column-count), minmax(0, 1fr));
 }
 
 @media screen and (max-width: 960px) {
