@@ -176,6 +176,7 @@ a:hover {
 
   .apps_item {
     display: flex;
+    width: 100%;
     padding: var(--edge-gap);
     margin-left: calc(0px - var(--edge-gap));
     height: 55px;
@@ -206,6 +207,7 @@ a:hover {
     flex-direction: column;
     justify-content: center;
     flex: 1;
+    min-width: 0;
     overflow: hidden;
     line-height: 1.3em;
     color: var(--color-text-acc);
