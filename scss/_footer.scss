@@ -4,8 +4,9 @@
   margin-left: auto;
   margin-right: auto;
   margin-top: 5vh;
-  width: 60%;
-  min-width: 800px;
+  min-width: var(--page-content-min-width);
+  padding-bottom: max(32px, env(safe-area-inset-bottom, 0px));
+  width: var(--page-content-width);
 
   .footer-info {
     padding-top: 1em;
@@ -25,7 +26,8 @@
 }
 
 #theme-selector {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(var(--theme-column-count), minmax(0, 1fr));
   margin-bottom: 2em;
 }

@@ -1,10 +1,10 @@
 .theme-button {
   font-size: 0.8em;
-  margin: 2px;
-  width: 128px;
   line-height: 3em;
+  min-width: 0;
   text-align: center;
   text-transform: uppercase;
+  width: 100%;
 }
 
 .theme-blackboard {
