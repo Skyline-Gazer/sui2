@@ -49,8 +49,13 @@ function loadSearchItems() {
 // On clearing the search, only untouched categories that were initially
 // closed and are still open are rolled back.
 const searchOpened = new Map()
+// every category the user clicked during the search session, even before
+// the search first matched an item inside it — so a category the user
+// already folded is never force-opened when it later becomes a match
+const userClicked = new Set()
 
 function onSummaryClick(d) {
+  userClicked.add(d)
   const info = searchOpened.get(d)
   if (info) info.userTouched = true
 }
@@ -124,6 +129,7 @@ function resetSearchState() {
     if (!info.userTouched && !info.wasOpen && details.open) details.open = false
   })
   searchOpened.clear()
+  userClicked.clear()
 }
 
 function handleMatchedItems(items) {
@@ -137,12 +143,14 @@ function handleMatchedItems(items) {
     // search — their latest choice wins (items there are still highlighted)
     const details = item.el.closest('details')
     if (details) {
-      const info = searchOpened.get(details)
+      let info = searchOpened.get(details)
       if (!info) {
-        // remember the state before the search first touched this category
-        searchOpened.set(details, {wasOpen: details.open, userTouched: false})
+        // remember the state before the search first touched this category;
+        // clicks made before the first match also count as user intent
+        info = {wasOpen: details.open, userTouched: userClicked.has(details)}
+        searchOpened.set(details, info)
       }
-      if (!(info && info.userTouched) && !details.open) {
+      if (!info.userTouched && !details.open) {
         details.open = true
       }
     }
@@ -160,6 +168,8 @@ function handleMatchedItems(items) {
 }
 
 function highlightText(el, match) {
+  // no match data: leave the text as-is instead of crashing
+  if (!match || !match.indices || !match.indices.length) return
   // get the longest part
   match.indices.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]))
   const pos = match.indices[0]
