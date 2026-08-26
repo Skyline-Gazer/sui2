@@ -1,0 +1,57 @@
+name: opencode-review
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+      issues: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run OpenCode multi-agent review
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+
+        with:
+          model: opencode-go/deepseek-v4-flash
+          agent: review-orchestrator
+          prompt: |
+            Review this pull request using the repository's
+            review-orchestrator framework.
+
+            Follow the orchestrator workflow exactly.
+
+            Run bug-reviewer and impact-reviewer independently.
+
+            Pass their candidate findings to review-verifier.
+
+            Use grok-verifier only for findings explicitly requiring
+            escalation.
+
+            Publish only confirmed actionable findings.
+
+            For every confirmed finding provide a self-contained AI Fix Prompt.
+
+            Also provide one Fix All Prompt containing all confirmed findings.
+
+            If no actionable issue is confirmed, clearly say so.
